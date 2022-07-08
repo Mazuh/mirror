@@ -2,8 +2,10 @@
   "name": "mirror",
   "version": "1.0.0",
   "description": "Simple test for your camera and microphone devices, just like a mirror.",
-  "main": "src/index.js",
+  "main": "index.html",
   "scripts": {
+    "start": "parcel index.html --open",
+    "build": "parcel build index.html",
     "test": "echo 'No tests' && exit 1"
   },
   "repository": {
@@ -21,5 +23,17 @@
   "bugs": {
     "url": "https://github.com/Mazuh/mirror/issues"
   },
-  "homepage": "https://github.com/Mazuh/mirror#readme"
+  "homepage": "https://github.com/Mazuh/mirror#readme",
+  "devDependencies": {
+    "@babel/core": "^7.18.6",
+    "prettier": "^2.7.1",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "parcel-bundler": "^1.12.5"
+  },
+  "resolutions": {
+    "@babel/preset-env": "7.13.8"
+  },
+  "private": true
 }
