@@ -41,6 +41,10 @@ select {
   transform: rotateY(180deg);
 }
 
+.t-line-through {
+  text-decoration: line-through;
+}
+
 /* specific stuff */
 
 .error-message {
