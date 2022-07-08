@@ -1,0 +1,25 @@
+{
+  "name": "mirror",
+  "version": "1.0.0",
+  "description": "Simple test for your camera and microphone devices, just like a mirror.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo 'No tests' && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mazuh/mirror.git"
+  },
+  "keywords": [
+    "webrtc",
+    "audio",
+    "video",
+    "test"
+  ],
+  "author": "Mazuh",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Mazuh/mirror/issues"
+  },
+  "homepage": "https://github.com/Mazuh/mirror#readme"
+}
