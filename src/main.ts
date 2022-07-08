@@ -61,6 +61,10 @@ function assertDevicesStatus(devices: FetchedMediaDevices): boolean {
 }
 
 function showCameraSelector(cameras: MediaDeviceInfo[]): void {
+  if (!cameras.length) {
+    return;
+  }
+
   const camerasEmptyEl = getOrDie('cameras-empty');
   camerasEmptyEl.classList.remove('d-block');
   camerasEmptyEl.classList.add('d-none');
@@ -73,6 +77,9 @@ function showCameraSelector(cameras: MediaDeviceInfo[]): void {
   cameras.forEach((camera) => {
     const optionEl = document.createElement('option');
     optionEl.innerText = camera.label;
+    if (camera.deviceId === 'default') {
+      optionEl.innerText += ' (Default)';
+    }
     optionEl.title = camera.deviceId;
     optionEl.value = camera.deviceId;
     camerasSelectEl.appendChild(optionEl);
@@ -80,6 +87,10 @@ function showCameraSelector(cameras: MediaDeviceInfo[]): void {
 }
 
 function showMicrophonesList(microphones: MediaDeviceInfo[]): void {
+  if (!microphones.length) {
+    return;
+  }
+
   const microphonesEmptyEl = getOrDie('microphones-empty');
   microphonesEmptyEl.classList.remove('d-block');
   microphonesEmptyEl.classList.add('d-none');
@@ -93,7 +104,7 @@ function showMicrophonesList(microphones: MediaDeviceInfo[]): void {
     const listItemEl = document.createElement('li');
     listItemEl.innerText = microphone.label;
     if (microphone.deviceId === 'default') {
-      listItemEl.innerHTML += ' <em>(Default)</em>';
+      listItemEl.innerText += ' (Default)';
     }
     listItemEl.title = microphone.deviceId;
     microphonesListEl.appendChild(listItemEl);
