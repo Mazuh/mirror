@@ -5,7 +5,9 @@
   "main": "index.html",
   "scripts": {
     "start": "parcel index.html --open",
-    "build": "parcel build index.html",
+    "build": "parcel build index.html --no-cache",
+    "clear-dist": "rm -rf docs/ && rm -rf dist/ && rm -rf .cache/",
+    "deploy": "./deploy.sh",
     "test": "echo 'No tests' && exit 1"
   },
   "repository": {
