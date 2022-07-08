@@ -37,6 +37,10 @@ select {
   display: block;
 }
 
+.mirroed {
+  transform: rotateY(180deg);
+}
+
 /* specific stuff */
 
 .error-message {

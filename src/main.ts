@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
   }
 
   showCameraSelector(devices.cameras);
+  getOrDie('cameras-select').addEventListener('change', activateSelectedCamera);
+
   showMicrophonesList(devices.microphones);
 });
 
@@ -80,6 +82,11 @@ function showCameraSelector(cameras: MediaDeviceInfo[]): void {
   camerasSelectEl.classList.remove('d-none');
   camerasSelectEl.innerHTML = '';
 
+  const noOptionEl = document.createElement('option');
+  noOptionEl.innerText = 'Turned off';
+  noOptionEl.value = '';
+  camerasSelectEl.appendChild(noOptionEl);
+
   cameras.forEach((camera) => {
     const optionEl = document.createElement('option');
     optionEl.innerText = camera.label;
@@ -90,6 +97,35 @@ function showCameraSelector(cameras: MediaDeviceInfo[]): void {
     optionEl.value = camera.deviceId;
     camerasSelectEl.appendChild(optionEl);
   });
+}
+
+async function activateSelectedCamera(): Promise<void> {
+  const camerasSelectEl = getOrDie('cameras-select') as HTMLSelectElement;
+  const isTurningOn = !!camerasSelectEl.value;
+
+  const cameraDemoSectionEl = getOrDie('camera-demo-section') as HTMLDivElement;
+  if (isTurningOn) {
+    cameraDemoSectionEl.classList.add('d-block');
+    cameraDemoSectionEl.classList.remove('d-none');
+  } else {
+    cameraDemoSectionEl.classList.remove('d-block');
+    cameraDemoSectionEl.classList.add('d-none');
+  }
+
+  const videoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
+  if (videoEl.srcObject) {
+    (videoEl.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
+  }
+
+  if (!isTurningOn) {
+    return;
+  }
+
+  const videoStream = await navigator.mediaDevices.getUserMedia({
+    video: { deviceId: camerasSelectEl.value },
+  });
+  videoEl.srcObject = videoStream;
+  await videoEl.play();
 }
 
 function showMicrophonesList(microphones: MediaDeviceInfo[]): void {
