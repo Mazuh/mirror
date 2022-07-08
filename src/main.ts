@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
   }
 
   showCameraSelector(devices.cameras);
-  showCameraSelector(devices.microphones);
+  showMicrophonesList(devices.microphones);
 });
 
 /* WebRTC */
@@ -34,7 +34,7 @@ async function fetchInputDevices(): Promise<FetchedMediaDevices> {
 /* UI */
 
 function getOrDie(elementId: string): HTMLElement {
-  const element = document.getElementById('error');
+  const element = document.getElementById(elementId);
   if (!element) {
     document.getElementsByTagName('main')[0].innerHTML =
       '<p class="error-message">Failed to load page for programming reasons.</p>';
@@ -44,7 +44,7 @@ function getOrDie(elementId: string): HTMLElement {
   return element;
 }
 
-function assertDevicesStatus(devices: FetchedMediaDevices) {
+function assertDevicesStatus(devices: FetchedMediaDevices): boolean {
   const errorEl = getOrDie('error');
 
   if (!devices.cameras.length && !devices.microphones.length) {
@@ -61,10 +61,27 @@ function assertDevicesStatus(devices: FetchedMediaDevices) {
   return true;
 }
 
-function showCameraSelector(cameras: MediaDeviceInfo[]) {
+function showCameraSelector(cameras: MediaDeviceInfo[]): void {
   console.warn('showCameraSelector: not implemented yet', cameras);
 }
 
-function showMicrophonesList(microphones: MediaDeviceInfo[]) {
-  console.warn('showMicrophonesList: not implemented yet', microphones);
+function showMicrophonesList(microphones: MediaDeviceInfo[]): void {
+  const microphonesEmptyEl = getOrDie('microphones-empty');
+  microphonesEmptyEl.classList.remove('d-block');
+  microphonesEmptyEl.classList.add('d-none');
+
+  const microphonesList = getOrDie('microphones-list');
+  microphonesList.classList.add('d-block');
+  microphonesList.classList.remove('d-none');
+  microphonesList.innerHTML = '';
+
+  microphones.forEach((microphone) => {
+    const listItemEl = document.createElement('li');
+    listItemEl.innerText = microphone.label;
+    if (microphone.deviceId === 'default') {
+      listItemEl.innerHTML += ' <em>(Default)</em>';
+    }
+    listItemEl.title = microphone.deviceId;
+    microphonesList.appendChild(listItemEl);
+  });
 }
