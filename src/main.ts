@@ -49,8 +49,14 @@ function assertDevicesStatus(devices: FetchedMediaDevices): boolean {
   if (!devices.cameras.length && !devices.microphones.length) {
     errorEl.innerHTML = `
       <strong>Failed to fetch cameras and microphones...</strong>
+      <br />
+      <br />
       Please, make sure at least one media input device is connected
-      and your browser has permanent permission to access them.
+      and your browser has <em>permanent permission</em> to access them.
+      <br />
+      <br />
+      Refresh this page to try again
+      <small>(and don't use Safari, get a real browser).</small>
     `;
     errorEl.classList.remove('d-none');
     errorEl.classList.add('d-block');
