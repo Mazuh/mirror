@@ -15,6 +15,20 @@ a {
   color: #f5f6fa;
 }
 
+select {
+  background: #192a56;
+  color: #f5f6fa;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+@media only screen and (max-width: 800px) {
+  select {
+    width: 100%;
+  }
+}
+
 .d-none {
   display: none;
 }

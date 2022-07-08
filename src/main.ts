@@ -19,8 +19,9 @@ interface FetchedMediaDevices {
 
 async function fetchInputDevices(): Promise<FetchedMediaDevices> {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    stream.getTracks().forEach((t) => t.stop());
+    askMediaPermission({ video: true });
+    askMediaPermission({ audio: true });
+
     const allDevices = (await navigator.mediaDevices.enumerateDevices()).filter((d) => !!d.label);
     const cameras = allDevices.filter((d) => d.kind === 'videoinput');
     const microphones = allDevices.filter((d) => d.kind === 'audioinput');
@@ -31,18 +32,16 @@ async function fetchInputDevices(): Promise<FetchedMediaDevices> {
   }
 }
 
-/* UI */
-
-function getOrDie(elementId: string): HTMLElement {
-  const element = document.getElementById(elementId);
-  if (!element) {
-    document.getElementsByTagName('main')[0].innerHTML =
-      '<p class="error-message">Failed to load page for programming reasons.</p>';
-    throw new Error(`Unavailable DOM element: ${elementId}`);
+async function askMediaPermission(constraints: MediaStreamConstraints): Promise<void> {
+  try {
+    const videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+    videoStream.getTracks().forEach((t) => t.stop());
+  } catch (error) {
+    console.error(`Error while requesting user media.`, constraints, error);
   }
-
-  return element;
 }
+
+/* UI */
 
 function assertDevicesStatus(devices: FetchedMediaDevices): boolean {
   const errorEl = getOrDie('error');
@@ -62,7 +61,22 @@ function assertDevicesStatus(devices: FetchedMediaDevices): boolean {
 }
 
 function showCameraSelector(cameras: MediaDeviceInfo[]): void {
-  console.warn('showCameraSelector: not implemented yet', cameras);
+  const camerasEmptyEl = getOrDie('cameras-empty');
+  camerasEmptyEl.classList.remove('d-block');
+  camerasEmptyEl.classList.add('d-none');
+
+  const camerasSelectEl = getOrDie('cameras-select');
+  camerasSelectEl.classList.add('d-block');
+  camerasSelectEl.classList.remove('d-none');
+  camerasSelectEl.innerHTML = '';
+
+  cameras.forEach((camera) => {
+    const optionEl = document.createElement('option');
+    optionEl.innerText = camera.label;
+    optionEl.title = camera.deviceId;
+    optionEl.value = camera.deviceId;
+    camerasSelectEl.appendChild(optionEl);
+  });
 }
 
 function showMicrophonesList(microphones: MediaDeviceInfo[]): void {
@@ -70,10 +84,10 @@ function showMicrophonesList(microphones: MediaDeviceInfo[]): void {
   microphonesEmptyEl.classList.remove('d-block');
   microphonesEmptyEl.classList.add('d-none');
 
-  const microphonesList = getOrDie('microphones-list');
-  microphonesList.classList.add('d-block');
-  microphonesList.classList.remove('d-none');
-  microphonesList.innerHTML = '';
+  const microphonesListEl = getOrDie('microphones-list');
+  microphonesListEl.classList.add('d-block');
+  microphonesListEl.classList.remove('d-none');
+  microphonesListEl.innerHTML = '';
 
   microphones.forEach((microphone) => {
     const listItemEl = document.createElement('li');
@@ -82,6 +96,17 @@ function showMicrophonesList(microphones: MediaDeviceInfo[]): void {
       listItemEl.innerHTML += ' <em>(Default)</em>';
     }
     listItemEl.title = microphone.deviceId;
-    microphonesList.appendChild(listItemEl);
+    microphonesListEl.appendChild(listItemEl);
   });
+}
+
+function getOrDie(elementId: string): HTMLElement {
+  const element = document.getElementById(elementId);
+  if (!element) {
+    document.getElementsByTagName('main')[0].innerHTML =
+      '<p class="error-message">Failed to load page for programming reasons.</p>';
+    throw new Error(`Unavailable DOM element: ${elementId}`);
+  }
+
+  return element;
 }
