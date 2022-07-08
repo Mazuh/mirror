@@ -1,12 +1,55 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Parcel Sandbox</title>
+    <title>Mirror</title>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Simple test for your camera and microphone devices, just like a mirror."
+    />
   </head>
-
   <body>
-    <div id="app"></div>
+    <header class="page-header">
+      <h1>Mirror</h1>
+      <small class="d-block"> 🪞 Simple test for your camera and microphone devices. </small>
+      <br />
+    </header>
+
+    <main class="page-main">
+      <noscript>
+        <p class="error-message">Enable JavaScript in your browser to use this application.</p>
+      </noscript>
+
+      <p id="error" class="error-message d-none"></p>
+
+      <section class="device-section">
+        <label>
+          <strong>Camera:</strong>
+          <br />
+          <span id="cameras-empty">No camera found yet.</span>
+          <select id="cameras-select" class="d-none">
+            <option>-- Select camera --</option>
+          </select>
+        </label>
+      </section>
+
+      <section class="device-section">
+        <strong>Microphones:</strong>
+        <br />
+        <span id="microphones-empty">No microphone found yet.</span>
+        <ul id="microphones-list" class="d-none"></ul>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <small>
+        Made with <a href="https://motherfuckingwebsite.com/" target="_blank">love</a> by
+        <a href="https://github.com/Mazuh/" target="_blank">Mazuh</a> -- it's
+        <a href="https://github.com/Mazuh/mirror" target="_blank">free source</a>!
+      </small>
+    </footer>
+
     <script src="src/index.js"></script>
   </body>
 </html>
