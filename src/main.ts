@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
   showCameraSelector(devices.cameras);
   getOrDie('cameras-select').addEventListener('change', activateSelectedCamera);
 
-  showMicrophonesList(devices.microphones);
+  showMicrophoneSelector(devices.microphones);
+  getOrDie('microphones-select').addEventListener('change', activateSelectedMicrophone);
 
   showAudioOutputsList(devices.audioOutputs);
 });
@@ -27,6 +28,7 @@ async function fetchInputDevices(): Promise<FetchedMediaDevices> {
     if (!(await hasVideoPermissions())) {
       await askMediaPermission({ video: true });
     }
+
     if (!(await hasAudioPermissions())) {
       await askMediaPermission({ audio: true });
     }
@@ -61,6 +63,33 @@ async function askMediaPermission(constraints: MediaStreamConstraints): Promise<
   } catch (error) {
     console.error(`Error while requesting user media.`, constraints, error);
   }
+}
+
+async function startVideoMirror(deviceId: string) {
+  const videoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
+  const videoStream = await navigator.mediaDevices.getUserMedia({
+    video: { deviceId },
+  });
+  videoEl.srcObject = videoStream;
+  return videoEl.play();
+}
+
+async function stopVideoMirror() {
+  const videoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
+  if (!videoEl.srcObject) {
+    return;
+  }
+
+  (videoEl.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
+  videoEl.srcObject = null;
+}
+
+async function startAudioEchoCall(deviceId: string) {
+  console.warn('Not implemented yet: startEchoCall', deviceId);
+}
+
+async function stopAudioEchoCall() {
+  console.warn('Not implemented yet: stopEchoCall');
 }
 
 /* UI */
@@ -131,23 +160,16 @@ async function activateSelectedCamera(): Promise<void> {
     cameraDemoSectionEl.classList.add('d-none');
   }
 
-  const videoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
-  if (videoEl.srcObject) {
-    (videoEl.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
-  }
+  await stopVideoMirror();
 
   if (!isTurningOn) {
     return;
   }
 
-  const videoStream = await navigator.mediaDevices.getUserMedia({
-    video: { deviceId: camerasSelectEl.value },
-  });
-  videoEl.srcObject = videoStream;
-  await videoEl.play();
+  await startVideoMirror(camerasSelectEl.value);
 }
 
-function showMicrophonesList(microphones: MediaDeviceInfo[]): void {
+function showMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
   if (!microphones.length) {
     return;
   }
@@ -156,20 +178,48 @@ function showMicrophonesList(microphones: MediaDeviceInfo[]): void {
   microphonesEmptyEl.classList.remove('d-block');
   microphonesEmptyEl.classList.add('d-none');
 
-  const microphonesListEl = getOrDie('microphones-list');
-  microphonesListEl.classList.add('d-block');
-  microphonesListEl.classList.remove('d-none');
-  microphonesListEl.innerHTML = '';
+  const microphonesSelectEl = getOrDie('microphones-select');
+  microphonesSelectEl.classList.add('d-block');
+  microphonesSelectEl.classList.remove('d-none');
+  microphonesSelectEl.innerHTML = '';
+
+  const noOptionEl = document.createElement('option');
+  noOptionEl.innerText = 'Turned off';
+  noOptionEl.value = '';
+  microphonesSelectEl.appendChild(noOptionEl);
 
   microphones.forEach((microphone) => {
-    const listItemEl = document.createElement('li');
-    listItemEl.innerText = microphone.label;
+    const optionEl = document.createElement('option');
+    optionEl.innerText = microphone.label;
     if (microphone.deviceId === 'default') {
-      listItemEl.innerText += ' (Default)';
+      optionEl.innerText += ' (Default)';
     }
-    listItemEl.title = microphone.deviceId;
-    microphonesListEl.appendChild(listItemEl);
+    optionEl.title = microphone.deviceId;
+    optionEl.value = microphone.deviceId;
+    microphonesSelectEl.appendChild(optionEl);
   });
+}
+
+async function activateSelectedMicrophone(): Promise<void> {
+  const microphonesSelectEl = getOrDie('microphones-select') as HTMLSelectElement;
+  const isTurningOn = !!microphonesSelectEl.value;
+
+  const microphoneDemoSectionEl = getOrDie('microphone-demo-section') as HTMLDivElement;
+  if (isTurningOn) {
+    microphoneDemoSectionEl.classList.add('d-block');
+    microphoneDemoSectionEl.classList.remove('d-none');
+  } else {
+    microphoneDemoSectionEl.classList.remove('d-block');
+    microphoneDemoSectionEl.classList.add('d-none');
+  }
+
+  await stopAudioEchoCall();
+
+  if (!isTurningOn) {
+    return;
+  }
+
+  await startAudioEchoCall(microphonesSelectEl.value);
 }
 
 function showAudioOutputsList(audioOutputs: MediaDeviceInfo[]): void {
