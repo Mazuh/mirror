@@ -21,10 +21,10 @@ interface FetchedMediaDevices {
 
 async function fetchInputDevices(): Promise<FetchedMediaDevices> {
   try {
-    if (!hasVideoPermissions()) {
+    if (!(await hasVideoPermissions())) {
       await askMediaPermission({ video: true });
     }
-    if (!hasAudioPermissions()) {
+    if (!(await hasAudioPermissions())) {
       await askMediaPermission({ audio: true });
     }
 
@@ -38,13 +38,13 @@ async function fetchInputDevices(): Promise<FetchedMediaDevices> {
   }
 }
 
-async function hasVideoPermissions() {
+async function hasVideoPermissions(): Promise<boolean> {
   return (await navigator.mediaDevices.enumerateDevices())
     .filter((d) => d.kind === 'videoinput')
     .some((d) => !!d.label);
 }
 
-async function hasAudioPermissions() {
+async function hasAudioPermissions(): Promise<boolean> {
   return (await navigator.mediaDevices.enumerateDevices())
     .filter((d) => d.kind === 'audioinput' || d.kind === 'audiooutput')
     .some((d) => !!d.label);
