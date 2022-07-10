@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
   getOrDie('cameras-select').addEventListener('change', activateSelectedCamera);
 
   showMicrophonesList(devices.microphones);
+
+  showAudioOutputsList(devices.audioOutputs);
 });
 
 /* WebRTC */
@@ -17,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 interface FetchedMediaDevices {
   cameras: MediaDeviceInfo[];
   microphones: MediaDeviceInfo[];
+  audioOutputs: MediaDeviceInfo[];
 }
 
 async function fetchInputDevices(): Promise<FetchedMediaDevices> {
@@ -31,10 +34,11 @@ async function fetchInputDevices(): Promise<FetchedMediaDevices> {
     const allDevices = (await navigator.mediaDevices.enumerateDevices()).filter((d) => !!d.label);
     const cameras = allDevices.filter((d) => d.kind === 'videoinput');
     const microphones = allDevices.filter((d) => d.kind === 'audioinput');
-    return { cameras, microphones };
+    const audioOutputs = allDevices.filter((d) => d.kind === 'audiooutput');
+    return { cameras, microphones, audioOutputs };
   } catch (error) {
     console.error(`Error while fetching media devices.`, error);
-    return { cameras: [], microphones: [] };
+    return { cameras: [], microphones: [], audioOutputs: [] };
   }
 }
 
@@ -46,7 +50,7 @@ async function hasVideoPermissions(): Promise<boolean> {
 
 async function hasAudioPermissions(): Promise<boolean> {
   return (await navigator.mediaDevices.enumerateDevices())
-    .filter((d) => d.kind === 'audioinput' || d.kind === 'audiooutput')
+    .filter((d) => d.kind === 'audioinput')
     .some((d) => !!d.label);
 }
 
@@ -165,6 +169,31 @@ function showMicrophonesList(microphones: MediaDeviceInfo[]): void {
     }
     listItemEl.title = microphone.deviceId;
     microphonesListEl.appendChild(listItemEl);
+  });
+}
+
+function showAudioOutputsList(audioOutputs: MediaDeviceInfo[]): void {
+  if (!audioOutputs.length) {
+    return;
+  }
+
+  const audioOutputsEmptyEl = getOrDie('audio-outputs-empty');
+  audioOutputsEmptyEl.classList.remove('d-block');
+  audioOutputsEmptyEl.classList.add('d-none');
+
+  const audioOutputsListEl = getOrDie('audio-outputs-list');
+  audioOutputsListEl.classList.add('d-block');
+  audioOutputsListEl.classList.remove('d-none');
+  audioOutputsListEl.innerHTML = '';
+
+  audioOutputs.forEach((audioOutput) => {
+    const listItemEl = document.createElement('li');
+    listItemEl.innerText = audioOutput.label;
+    if (audioOutput.deviceId === 'default') {
+      listItemEl.innerText += ' (Default)';
+    }
+    listItemEl.title = audioOutput.deviceId;
+    audioOutputsListEl.appendChild(listItemEl);
   });
 }
 
