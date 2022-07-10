@@ -21,8 +21,12 @@ interface FetchedMediaDevices {
 
 async function fetchInputDevices(): Promise<FetchedMediaDevices> {
   try {
-    await askMediaPermission({ video: true });
-    await askMediaPermission({ audio: true });
+    if (!hasVideoPermissions()) {
+      await askMediaPermission({ video: true });
+    }
+    if (!hasAudioPermissions()) {
+      await askMediaPermission({ audio: true });
+    }
 
     const allDevices = (await navigator.mediaDevices.enumerateDevices()).filter((d) => !!d.label);
     const cameras = allDevices.filter((d) => d.kind === 'videoinput');
@@ -32,6 +36,18 @@ async function fetchInputDevices(): Promise<FetchedMediaDevices> {
     console.error(`Error while fetching media devices.`, error);
     return { cameras: [], microphones: [] };
   }
+}
+
+async function hasVideoPermissions() {
+  return (await navigator.mediaDevices.enumerateDevices())
+    .filter((d) => d.kind === 'videoinput')
+    .some((d) => !!d.label);
+}
+
+async function hasAudioPermissions() {
+  return (await navigator.mediaDevices.enumerateDevices())
+    .filter((d) => d.kind === 'audioinput' || d.kind === 'audiooutput')
+    .some((d) => !!d.label);
 }
 
 async function askMediaPermission(constraints: MediaStreamConstraints): Promise<void> {
