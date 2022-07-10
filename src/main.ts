@@ -21,8 +21,8 @@ interface FetchedMediaDevices {
 
 async function fetchInputDevices(): Promise<FetchedMediaDevices> {
   try {
-    askMediaPermission({ video: true });
-    askMediaPermission({ audio: true });
+    await askMediaPermission({ video: true });
+    await askMediaPermission({ audio: true });
 
     const allDevices = (await navigator.mediaDevices.enumerateDevices()).filter((d) => !!d.label);
     const cameras = allDevices.filter((d) => d.kind === 'videoinput');
