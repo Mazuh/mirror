@@ -57,8 +57,7 @@ function assertDevicesStatus(devices: FetchedMediaDevices): boolean {
       and your browser has <em>permanent permission</em> to access them.
       <br />
       <br />
-      Refresh this page to try again
-      <small>(and don't use Safari, get a real browser).</small>
+      Then refresh this page to try again.
     `;
     errorEl.classList.remove('d-none');
     errorEl.classList.add('d-block');
