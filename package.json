@@ -2,10 +2,10 @@
   "name": "mirror",
   "version": "1.0.0",
   "description": "Simple test for your camera and microphone devices, just like a mirror.",
-  "main": "index.html",
+  "main": "src/index.html",
   "scripts": {
-    "start": "parcel index.html --open",
-    "build": "parcel build index.html --no-cache",
+    "start": "parcel src/index.html --open",
+    "build": "parcel build src/index.html --no-cache",
     "clear-dist": "rm -rf docs/ && rm -rf dist/ && rm -rf .cache/",
     "deploy": "./deploy.sh",
     "test": "echo 'No tests' && exit 1"
