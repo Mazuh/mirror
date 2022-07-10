@@ -37,6 +37,10 @@ select {
   display: block;
 }
 
+.w-100 {
+  width: 100%;
+}
+
 .mirroed {
   transform: rotateY(180deg);
 }
