@@ -127,7 +127,6 @@ export async function startAudioEcho(
     const blob = new Blob([event.data]);
     const url = URL.createObjectURL(blob);
     audioEl.src = url;
-    audioEl.currentTime = 0;
 
     console.log('Playing recorded chunk, then will continue to a next iteration.');
     try {
