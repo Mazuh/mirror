@@ -1,4 +1,3 @@
-import { getOrDie } from './dom';
 import { FetchedMediaDevices, startAudioEcho, startVideoMirror } from './webrtc';
 
 export function assertDevicesStatus(devices: FetchedMediaDevices): boolean {
@@ -62,29 +61,6 @@ export function setupCameraSelector(cameras: MediaDeviceInfo[]): void {
   camerasSelectEl.addEventListener('change', handleChange);
 }
 
-async function activateSelectedCamera(): Promise<() => void> {
-  const camerasSelectEl = getOrDie('cameras-select') as HTMLSelectElement;
-  const isTurningOn = !!camerasSelectEl.value;
-
-  const cameraDemoSectionEl = getOrDie('camera-demo-section') as HTMLDivElement;
-  if (isTurningOn) {
-    cameraDemoSectionEl.classList.add('d-block');
-    cameraDemoSectionEl.classList.remove('d-none');
-  } else {
-    cameraDemoSectionEl.classList.remove('d-block');
-    cameraDemoSectionEl.classList.add('d-none');
-  }
-
-  if (!isTurningOn) {
-    return () => {};
-  }
-
-  return await startVideoMirror(
-    camerasSelectEl.value,
-    getOrDie('camera-demo-video') as HTMLVideoElement
-  );
-}
-
 export function setupMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
   if (!microphones.length) {
     return;
@@ -124,6 +100,54 @@ export function setupMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
   microphonesSelectEl.addEventListener('change', handleChange);
 }
 
+export function showAudioOutputsList(audioOutputs: MediaDeviceInfo[]): void {
+  if (!audioOutputs.length) {
+    return;
+  }
+
+  const audioOutputsEmptyEl = getOrDie('audio-outputs-empty');
+  audioOutputsEmptyEl.classList.remove('d-block');
+  audioOutputsEmptyEl.classList.add('d-none');
+
+  const audioOutputsListEl = getOrDie('audio-outputs-list');
+  audioOutputsListEl.classList.add('d-block');
+  audioOutputsListEl.classList.remove('d-none');
+  audioOutputsListEl.innerHTML = '';
+
+  audioOutputs.forEach((audioOutput) => {
+    const listItemEl = document.createElement('li');
+    listItemEl.innerText = audioOutput.label;
+    if (audioOutput.deviceId === 'default') {
+      listItemEl.innerText += ' (Default)';
+    }
+    listItemEl.title = audioOutput.deviceId;
+    audioOutputsListEl.appendChild(listItemEl);
+  });
+}
+
+async function activateSelectedCamera(): Promise<() => void> {
+  const camerasSelectEl = getOrDie('cameras-select') as HTMLSelectElement;
+  const isTurningOn = !!camerasSelectEl.value;
+
+  const cameraDemoSectionEl = getOrDie('camera-demo-section') as HTMLDivElement;
+  if (isTurningOn) {
+    cameraDemoSectionEl.classList.add('d-block');
+    cameraDemoSectionEl.classList.remove('d-none');
+  } else {
+    cameraDemoSectionEl.classList.remove('d-block');
+    cameraDemoSectionEl.classList.add('d-none');
+  }
+
+  if (!isTurningOn) {
+    return () => {};
+  }
+
+  return await startVideoMirror(
+    camerasSelectEl.value,
+    getOrDie('camera-demo-video') as HTMLVideoElement
+  );
+}
+
 async function activateSelectedMicrophone(): Promise<() => void> {
   const microphonesSelectEl = getOrDie('microphones-select') as HTMLSelectElement;
   const isTurningOn = !!microphonesSelectEl.value;
@@ -152,27 +176,13 @@ async function activateSelectedMicrophone(): Promise<() => void> {
   }
 }
 
-export function showAudioOutputsList(audioOutputs: MediaDeviceInfo[]): void {
-  if (!audioOutputs.length) {
-    return;
+export function getOrDie(elementId: string): HTMLElement {
+  const element = document.getElementById(elementId);
+  if (!element) {
+    document.getElementsByTagName('main')[0].innerHTML =
+      '<p class="error-message">Failed to load page for programming reasons.</p>';
+    throw new Error(`Unavailable DOM element: ${elementId}`);
   }
 
-  const audioOutputsEmptyEl = getOrDie('audio-outputs-empty');
-  audioOutputsEmptyEl.classList.remove('d-block');
-  audioOutputsEmptyEl.classList.add('d-none');
-
-  const audioOutputsListEl = getOrDie('audio-outputs-list');
-  audioOutputsListEl.classList.add('d-block');
-  audioOutputsListEl.classList.remove('d-none');
-  audioOutputsListEl.innerHTML = '';
-
-  audioOutputs.forEach((audioOutput) => {
-    const listItemEl = document.createElement('li');
-    listItemEl.innerText = audioOutput.label;
-    if (audioOutput.deviceId === 'default') {
-      listItemEl.innerText += ' (Default)';
-    }
-    listItemEl.title = audioOutput.deviceId;
-    audioOutputsListEl.appendChild(listItemEl);
-  });
+  return element;
 }

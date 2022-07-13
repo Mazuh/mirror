@@ -13,8 +13,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
   }
 
   setupCameraSelector(devices.cameras);
-
   setupMicrophoneSelector(devices.microphones);
-
   showAudioOutputsList(devices.audioOutputs);
 });
