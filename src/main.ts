@@ -1,10 +1,8 @@
-import { getOrDie } from './dom';
 import {
-  activateSelectedCamera,
   assertDevicesStatus,
   showAudioOutputsList,
-  showCameraSelector,
-  configureMicrophoneSelector,
+  setupCameraSelector,
+  setupMicrophoneSelector,
 } from './ui';
 import { fetchInputDevices } from './webrtc';
 
@@ -14,10 +12,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     return;
   }
 
-  showCameraSelector(devices.cameras);
-  getOrDie('cameras-select').addEventListener('change', activateSelectedCamera);
+  setupCameraSelector(devices.cameras);
 
-  configureMicrophoneSelector(devices.microphones);
+  setupMicrophoneSelector(devices.microphones);
 
   showAudioOutputsList(devices.audioOutputs);
 });

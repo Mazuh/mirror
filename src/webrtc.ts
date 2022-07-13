@@ -1,5 +1,3 @@
-import { getOrDie } from './dom';
-
 export interface FetchedMediaDevices {
   cameras: MediaDeviceInfo[];
   microphones: MediaDeviceInfo[];
@@ -48,26 +46,27 @@ export async function askMediaPermission(constraints: MediaStreamConstraints): P
   }
 }
 
-export async function startVideoMirror(deviceId: string): Promise<void> {
+export async function startVideoMirror(
+  deviceId: string,
+  videoEl: HTMLVideoElement
+): Promise<() => void> {
   console.log('Starting video mirror for device:', deviceId);
-  const videoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
-  const videoStream = await navigator.mediaDevices.getUserMedia({
-    video: { deviceId },
-  });
-  videoEl.srcObject = videoStream;
-  return videoEl.play();
-}
 
-export async function stopVideoMirror(): Promise<void> {
-  console.log('Checking for any existing video mirror.');
-  const videoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
-  if (!videoEl.srcObject) {
-    return;
+  const videoStream = await navigator.mediaDevices.getUserMedia({ video: { deviceId } });
+  videoEl.srcObject = videoStream;
+
+  try {
+    await videoEl.play();
+  } catch (error) {
+    console.error('Detected exception on playing video feed, ignoring.', error);
   }
 
-  console.log('Existing video tracks found, cleaning up.');
-  (videoEl.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
-  videoEl.srcObject = null;
+  const stopVideoMirror = () => {
+    console.log('Killing video input track(s).');
+    (videoEl.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
+    videoEl.srcObject = null;
+  };
+  return stopVideoMirror;
 }
 
 export async function startAudioEcho(
@@ -75,6 +74,7 @@ export async function startAudioEcho(
   audioEl: HTMLAudioElement
 ): Promise<() => void> {
   console.log('Initializing audio echo for device:', deviceId);
+
   const recordingBufferRateMs = 1000;
 
   let stopRecordingTimeout = 0;
@@ -90,7 +90,7 @@ export async function startAudioEcho(
 
   const [track] = tracks;
   track.onended = () => {
-    console.log('Track ended, cleaning up echo resources. Track id:', track.id);
+    console.log('Track ended, cleaning up echo resources.');
     isRecording = false;
     clearTimeout(stopRecordingTimeout);
     clearInterval(checkRecordingInterval);
@@ -98,7 +98,7 @@ export async function startAudioEcho(
   };
 
   const killTrackAndTriggerEnding = () => {
-    console.log('Killing audio input track. Track id:', track.id);
+    console.log('Killing audio input track.');
     track.stop();
     track.dispatchEvent(new Event('ended'));
   };
@@ -112,7 +112,7 @@ export async function startAudioEcho(
 
   const recorder = new MediaRecorder(audioStream);
   recorder.ondataavailable = async (event) => {
-    console.log('Handling recorded chunk for device', deviceId);
+    console.log('Handling chunk for device', deviceId, 'Timeout id:', stopRecordingTimeout);
     clearTimeout(stopRecordingTimeout);
 
     if (!isRecording) {
@@ -133,7 +133,7 @@ export async function startAudioEcho(
     try {
       await audioEl.play();
     } catch (error) {
-      console.error('Detected exception on playing a recorded chunk, ignoring.', error);
+      console.error('Detected exception on playing a audio chunk, ignoring.', error);
     }
 
     recorder.start();
