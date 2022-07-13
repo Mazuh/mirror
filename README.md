@@ -2,7 +2,7 @@
 
 > Simple test for your camera and microphone devices, just like a mirror.
 
-Available at: <https://mazuh.github.io/mirror/> 🔗
+🔗 Available at: <https://mazuh.github.io/mirror/>
 
 ## Running it locally
 
@@ -12,6 +12,8 @@ With Node 18, install dependencies and its local development server:
 npm install
 npm start
 ```
+
+It's supposed to open your browser running the application with hot reloading.
 
 ## License
 
