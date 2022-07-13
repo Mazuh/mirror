@@ -59,6 +59,19 @@ export function setupCameraSelector(cameras: MediaDeviceInfo[]): void {
     currentCleanup = await activateSelectedCamera();
   };
   camerasSelectEl.addEventListener('change', handleChange);
+
+  const videoEl = getOrDie('camera-demo-video') as HTMLAudioElement;
+  const errorEl = getOrDie('camera-demo-error');
+  videoEl.onerror = () => {
+    errorEl.innerText = 'Unexpected error on video feedback.';
+    errorEl.classList.remove('d-none');
+    errorEl.classList.add('d-block');
+  };
+  videoEl.onplay = () => {
+    errorEl.innerText = '';
+    errorEl.classList.remove('d-block');
+    errorEl.classList.add('d-none');
+  };
 }
 
 export function setupMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
@@ -98,6 +111,19 @@ export function setupMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
     currentCleanup = await activateSelectedMicrophone();
   };
   microphonesSelectEl.addEventListener('change', handleChange);
+
+  const audioEl = getOrDie('microphone-demo-audio') as HTMLAudioElement;
+  const errorEl = getOrDie('microphone-demo-error');
+  audioEl.onerror = () => {
+    errorEl.innerText = 'Unexpected error on audio feedback.';
+    errorEl.classList.remove('d-none');
+    errorEl.classList.add('d-block');
+  };
+  audioEl.onplay = () => {
+    errorEl.innerText = '';
+    errorEl.classList.remove('d-block');
+    errorEl.classList.add('d-none');
+  };
 }
 
 export function showAudioOutputsList(audioOutputs: MediaDeviceInfo[]): void {
