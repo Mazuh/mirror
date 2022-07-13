@@ -110,13 +110,14 @@ export async function startAudioEcho(
     }
   }, 3000);
 
-  const blobType = 'audio/webm';
-  const recorderMimeType = 'audio/webm;codecs=opus';
-  console.log(
-    'Recorder mime type support:',
-    recorderMimeType,
-    MediaRecorder.isTypeSupported(recorderMimeType)
-  );
+  const foundSupportedMediaType = findMediaTypeForRecordings();
+  if (!foundSupportedMediaType) {
+    throw new Error('Failed to find supported media type (i.e., no supported MIME found).');
+  }
+
+  const blobType = foundSupportedMediaType;
+  const recorderMimeType = foundSupportedMediaType;
+  console.log('Recorder mime type:', foundSupportedMediaType);
 
   const recorder = new MediaRecorder(audioStream, { mimeType: recorderMimeType });
   recorder.ondataavailable = async (event) => {
@@ -155,4 +156,20 @@ export async function startAudioEcho(
 
   const stopAudioEcho = killTrackAndTriggerEnding;
   return stopAudioEcho;
+}
+
+function findMediaTypeForRecordings(): string | null {
+  // More complex discussion and approaches: https://stackoverflow.com/a/64656254
+  return (
+    [
+      'audio/mp3',
+      'audio/webm',
+      'audio/ogg',
+      'audio/x-matroska',
+      'video/mp4',
+      'video/webm',
+      'video/ogg',
+      'video/x-matroska',
+    ].find((mime) => MediaRecorder.isTypeSupported(mime)) || null
+  );
 }
