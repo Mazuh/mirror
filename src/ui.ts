@@ -56,22 +56,28 @@ export function setupCameraSelector(cameras: MediaDeviceInfo[]): void {
   const handleChange = async () => {
     currentCleanup();
 
-    currentCleanup = await activateSelectedCamera();
+    try {
+      currentCleanup = await activateSelectedCamera();
+    } catch (error) {
+      handleError();
+    }
   };
   camerasSelectEl.addEventListener('change', handleChange);
 
   const videoEl = getOrDie('camera-demo-video') as HTMLAudioElement;
   const errorEl = getOrDie('camera-demo-error');
-  videoEl.onerror = () => {
+  const handleError = () => {
     errorEl.innerText = 'Unexpected error on video feedback.';
     errorEl.classList.remove('d-none');
     errorEl.classList.add('d-block');
   };
-  videoEl.onplay = () => {
+  videoEl.onerror = handleError;
+  const handleOk = () => {
     errorEl.innerText = '';
     errorEl.classList.remove('d-block');
     errorEl.classList.add('d-none');
   };
+  videoEl.onplay = handleOk;
 }
 
 export function setupMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
@@ -108,22 +114,28 @@ export function setupMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
   const handleChange = async () => {
     currentCleanup();
 
-    currentCleanup = await activateSelectedMicrophone();
+    try {
+      currentCleanup = await activateSelectedMicrophone();
+    } catch (error) {
+      handleError();
+    }
   };
   microphonesSelectEl.addEventListener('change', handleChange);
 
   const audioEl = getOrDie('microphone-demo-audio') as HTMLAudioElement;
   const errorEl = getOrDie('microphone-demo-error');
-  audioEl.onerror = () => {
+  const handleError = () => {
     errorEl.innerText = 'Unexpected error on audio feedback.';
     errorEl.classList.remove('d-none');
     errorEl.classList.add('d-block');
   };
-  audioEl.onplay = () => {
+  audioEl.onerror = handleError;
+  const handleOk = () => {
     errorEl.innerText = '';
     errorEl.classList.remove('d-block');
     errorEl.classList.add('d-none');
   };
+  audioEl.onplay = handleOk;
 }
 
 export function showAudioOutputsList(audioOutputs: MediaDeviceInfo[]): void {
@@ -191,15 +203,10 @@ async function activateSelectedMicrophone(): Promise<() => void> {
     return () => {};
   }
 
-  try {
-    return await startAudioEcho(
-      microphonesSelectEl.value,
-      getOrDie('microphone-demo-audio') as HTMLAudioElement
-    );
-  } catch (error) {
-    microphonesSelectEl.value = '';
-    throw error;
-  }
+  return await startAudioEcho(
+    microphonesSelectEl.value,
+    getOrDie('microphone-demo-audio') as HTMLAudioElement
+  );
 }
 
 export function getOrDie(elementId: string): HTMLElement {
