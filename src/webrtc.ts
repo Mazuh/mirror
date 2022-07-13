@@ -70,10 +70,12 @@ export async function stopVideoMirror(): Promise<void> {
   videoEl.srcObject = null;
 }
 
-export async function startAudioEcho(deviceId: string): Promise<() => void> {
+export async function startAudioEcho(
+  deviceId: string,
+  audioEl: HTMLAudioElement
+): Promise<() => void> {
   console.log('Initializing audio echo for device:', deviceId);
   const recordingBufferRateMs = 1000;
-  const audioEl = getOrDie('microphone-demo-audio') as HTMLAudioElement;
 
   let stopRecordingTimeout = 0;
   let isRecording = false;

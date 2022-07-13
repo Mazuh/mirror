@@ -133,7 +133,10 @@ async function activateSelectedMicrophone(): Promise<() => void> {
   }
 
   try {
-    return await startAudioEcho(microphonesSelectEl.value);
+    return await startAudioEcho(
+      microphonesSelectEl.value,
+      getOrDie('microphone-demo-audio') as HTMLAudioElement
+    );
   } catch (error) {
     microphonesSelectEl.value = '';
     throw error;
