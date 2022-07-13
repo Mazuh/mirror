@@ -1,11 +1,5 @@
 import { getOrDie } from './dom';
-import {
-  FetchedMediaDevices,
-  startAudioEchoCall,
-  startVideoMirror,
-  stopAudioEchoCall,
-  stopVideoMirror,
-} from './webrtc';
+import { FetchedMediaDevices, startAudioEcho, startVideoMirror, stopVideoMirror } from './webrtc';
 
 export function assertDevicesStatus(devices: FetchedMediaDevices): boolean {
   const errorEl = getOrDie('error');
@@ -82,7 +76,7 @@ export async function activateSelectedCamera(): Promise<void> {
   await startVideoMirror(camerasSelectEl.value);
 }
 
-export function showMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
+export function configureMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
   if (!microphones.length) {
     return;
   }
@@ -111,9 +105,17 @@ export function showMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
     optionEl.value = microphone.deviceId;
     microphonesSelectEl.appendChild(optionEl);
   });
+
+  let currentCleanup = () => {};
+  const handleChange = async () => {
+    currentCleanup();
+
+    currentCleanup = await activateSelectedMicrophone();
+  };
+  microphonesSelectEl.addEventListener('change', handleChange);
 }
 
-export async function activateSelectedMicrophone(): Promise<void> {
+async function activateSelectedMicrophone(): Promise<() => void> {
   const microphonesSelectEl = getOrDie('microphones-select') as HTMLSelectElement;
   const isTurningOn = !!microphonesSelectEl.value;
 
@@ -126,13 +128,16 @@ export async function activateSelectedMicrophone(): Promise<void> {
     microphoneDemoSectionEl.classList.add('d-none');
   }
 
-  await stopAudioEchoCall();
-
   if (!isTurningOn) {
-    return;
+    return () => {};
   }
 
-  await startAudioEchoCall(microphonesSelectEl.value);
+  try {
+    return await startAudioEcho(microphonesSelectEl.value);
+  } catch (error) {
+    microphonesSelectEl.value = '';
+    throw error;
+  }
 }
 
 export function showAudioOutputsList(audioOutputs: MediaDeviceInfo[]): void {
