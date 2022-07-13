@@ -110,7 +110,15 @@ export async function startAudioEcho(
     }
   }, 3000);
 
-  const recorder = new MediaRecorder(audioStream);
+  const blobType = 'audio/webm';
+  const recorderMimeType = 'audio/webm;codecs=opus';
+  console.log(
+    'Recorder mime type support:',
+    recorderMimeType,
+    MediaRecorder.isTypeSupported(recorderMimeType)
+  );
+
+  const recorder = new MediaRecorder(audioStream, { mimeType: recorderMimeType });
   recorder.ondataavailable = async (event) => {
     console.log('Handling chunk for device', deviceId, 'Timeout id:', stopRecordingTimeout);
     clearTimeout(stopRecordingTimeout);
@@ -124,15 +132,16 @@ export async function startAudioEcho(
       return;
     }
 
-    const blob = new Blob([event.data]);
+    const blob = new Blob([event.data], { type: blobType });
     const url = URL.createObjectURL(blob);
     audioEl.src = url;
 
     console.log('Playing recorded chunk, then will continue to a next iteration.');
     try {
+      audioEl.muted = false;
       await audioEl.play();
     } catch (error) {
-      console.error('Detected exception on playing a audio chunk, ignoring.', error);
+      console.error('Detected exception on playing am audio chunk, ignoring.', error);
     }
 
     recorder.start();
