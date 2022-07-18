@@ -14,8 +14,7 @@ export function assertDevicesStatus(devices: FetchedMediaDevices): boolean {
       <br />
       Then refresh this page to try again.
     `;
-    errorEl.classList.remove('d-none');
-    errorEl.classList.add('d-block');
+    showBlock(errorEl);
     return false;
   }
 
@@ -28,12 +27,10 @@ export function setupCameraSelector(cameras: MediaDeviceInfo[]): void {
   }
 
   const camerasEmptyEl = getOrDie('cameras-empty');
-  camerasEmptyEl.classList.remove('d-block');
-  camerasEmptyEl.classList.add('d-none');
+  hideBlock(camerasEmptyEl);
 
   const camerasSelectEl = getOrDie('cameras-select');
-  camerasSelectEl.classList.add('d-block');
-  camerasSelectEl.classList.remove('d-none');
+  showBlock(camerasSelectEl);
   camerasSelectEl.innerHTML = '';
 
   const noOptionEl = document.createElement('option');
@@ -68,14 +65,12 @@ export function setupCameraSelector(cameras: MediaDeviceInfo[]): void {
   const errorEl = getOrDie('camera-demo-error');
   const handleError = () => {
     errorEl.innerText = 'Unexpected error on video feedback.';
-    errorEl.classList.remove('d-none');
-    errorEl.classList.add('d-block');
+    showBlock(errorEl);
   };
   videoEl.onerror = handleError;
   const handleOk = () => {
     errorEl.innerText = '';
-    errorEl.classList.remove('d-block');
-    errorEl.classList.add('d-none');
+    hideBlock(errorEl);
   };
   videoEl.onplay = handleOk;
 }
@@ -86,12 +81,10 @@ export function setupMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
   }
 
   const microphonesEmptyEl = getOrDie('microphones-empty');
-  microphonesEmptyEl.classList.remove('d-block');
-  microphonesEmptyEl.classList.add('d-none');
+  hideBlock(microphonesEmptyEl);
 
   const microphonesSelectEl = getOrDie('microphones-select');
-  microphonesSelectEl.classList.add('d-block');
-  microphonesSelectEl.classList.remove('d-none');
+  showBlock(microphonesSelectEl);
   microphonesSelectEl.innerHTML = '';
 
   const noOptionEl = document.createElement('option');
@@ -126,14 +119,12 @@ export function setupMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
   const errorEl = getOrDie('microphone-demo-error');
   const handleError = () => {
     errorEl.innerText = 'Unexpected error on audio feedback.';
-    errorEl.classList.remove('d-none');
-    errorEl.classList.add('d-block');
+    showBlock(errorEl);
   };
   audioEl.onerror = handleError;
   const handleOk = () => {
     errorEl.innerText = '';
-    errorEl.classList.remove('d-block');
-    errorEl.classList.add('d-none');
+    hideBlock(errorEl);
   };
   audioEl.onplay = handleOk;
 }
@@ -144,12 +135,10 @@ export function showAudioOutputsList(audioOutputs: MediaDeviceInfo[]): void {
   }
 
   const audioOutputsEmptyEl = getOrDie('audio-outputs-empty');
-  audioOutputsEmptyEl.classList.remove('d-block');
-  audioOutputsEmptyEl.classList.add('d-none');
+  hideBlock(audioOutputsEmptyEl);
 
   const audioOutputsListEl = getOrDie('audio-outputs-list');
-  audioOutputsListEl.classList.add('d-block');
-  audioOutputsListEl.classList.remove('d-none');
+  showBlock(audioOutputsListEl);
   audioOutputsListEl.innerHTML = '';
 
   audioOutputs.forEach((audioOutput) => {
@@ -169,11 +158,9 @@ async function activateSelectedCamera(): Promise<() => void> {
 
   const cameraDemoSectionEl = getOrDie('camera-demo-section') as HTMLDivElement;
   if (isTurningOn) {
-    cameraDemoSectionEl.classList.add('d-block');
-    cameraDemoSectionEl.classList.remove('d-none');
+    showBlock(cameraDemoSectionEl);
   } else {
-    cameraDemoSectionEl.classList.remove('d-block');
-    cameraDemoSectionEl.classList.add('d-none');
+    hideBlock(cameraDemoSectionEl);
   }
 
   if (!isTurningOn) {
@@ -192,11 +179,9 @@ async function activateSelectedMicrophone(): Promise<() => void> {
 
   const microphoneDemoSectionEl = getOrDie('microphone-demo-section') as HTMLDivElement;
   if (isTurningOn) {
-    microphoneDemoSectionEl.classList.add('d-block');
-    microphoneDemoSectionEl.classList.remove('d-none');
+    showBlock(microphoneDemoSectionEl);
   } else {
-    microphoneDemoSectionEl.classList.remove('d-block');
-    microphoneDemoSectionEl.classList.add('d-none');
+    hideBlock(microphoneDemoSectionEl);
   }
 
   if (!isTurningOn) {
@@ -209,7 +194,17 @@ async function activateSelectedMicrophone(): Promise<() => void> {
   );
 }
 
-export function getOrDie(elementId: string): HTMLElement {
+function showBlock(element: HTMLElement): void {
+  element.classList.add('d-block');
+  element.classList.remove('d-none');
+}
+
+function hideBlock(element: HTMLElement): void {
+  element.classList.remove('d-block');
+  element.classList.add('d-none');
+}
+
+function getOrDie(elementId: string): HTMLElement {
   const element = document.getElementById(elementId);
   if (!element) {
     document.getElementsByTagName('main')[0].innerHTML =
