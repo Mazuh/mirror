@@ -48,9 +48,21 @@
       </section>
 
       <section id="microphone-demo-section" class="device-section d-none">
-        <p><em>You should hear yourself now. Playing echo test...</em></p>
+        <p>
+          <em
+            >Use the button below to start recording yourself, then stop it when you're ready to
+            hear it back.</em
+          >
+        </p>
         <p id="microphone-demo-error" class="error-message d-none"></p>
-        <audio id="microphone-demo-audio" class="w-100" muted></audio>
+        <button id="microphone-demo-start-btn" class="outline-green d-block">
+          Start recording
+        </button>
+        <button id="microphone-demo-stop-btn" class="outline-yellow d-none">
+          🔴 Stop recording (to hear)
+        </button>
+        <br />
+        <audio id="microphone-demo-audio" class="d-none" autoplay controls muted></audio>
       </section>
 
       <section class="device-section">

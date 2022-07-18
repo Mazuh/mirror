@@ -1,4 +1,10 @@
-import { FetchedMediaDevices, startAudioEcho, startVideoMirror } from './webrtc';
+import {
+  CleanupFn,
+  FetchedMediaDevices,
+  NO_OP_CLEANUP,
+  startRecording,
+  startVideoMirror,
+} from './webrtc';
 
 export function assertDevicesStatus(devices: FetchedMediaDevices): boolean {
   const errorEl = getOrDie('error');
@@ -103,30 +109,78 @@ export function setupMicrophoneSelector(microphones: MediaDeviceInfo[]): void {
     microphonesSelectEl.appendChild(optionEl);
   });
 
-  let currentCleanup = () => {};
-  const handleChange = async () => {
-    currentCleanup();
+  const startRecordingBtn = getOrDie('microphone-demo-start-btn');
+  let handleStartRecordingClick = () => console.warn('Empty recorder click handler.');
+  startRecordingBtn.addEventListener('click', handleStartRecordingClick, { once: true });
 
-    try {
-      currentCleanup = await activateSelectedMicrophone();
-    } catch (error) {
-      handleError();
-    }
-  };
-  microphonesSelectEl.addEventListener('change', handleChange);
+  const stopRecordingBtn = getOrDie('microphone-demo-stop-btn');
+  let handleStopRecordingClick = () => console.warn('Empty stop click handler.');
+  let stopRecording: CleanupFn = NO_OP_CLEANUP;
+  stopRecordingBtn.addEventListener('click', handleStopRecordingClick, { once: true });
 
+  const microphoneDemoSectionEl = getOrDie('microphone-demo-section');
   const audioEl = getOrDie('microphone-demo-audio') as HTMLAudioElement;
+
+  const handleMicrophoneSelectorChange = (event: Event) => {
+    audioEl.muted = true;
+    hideBlock(audioEl);
+
+    const deviceId = (event.target as HTMLSelectElement).value;
+    const isActivating = !!deviceId;
+    if (isActivating) {
+      showBlock(microphoneDemoSectionEl);
+    } else {
+      hideBlock(microphoneDemoSectionEl);
+    }
+
+    startRecordingBtn.removeEventListener('click', handleStartRecordingClick);
+    showBlock(startRecordingBtn);
+    handleStartRecordingClick = async () => {
+      try {
+        audioEl.muted = true;
+        hideBlock(audioEl);
+        stopRecording = await startRecording(deviceId, audioEl);
+        hideBlock(startRecordingBtn);
+        showBlock(stopRecordingBtn);
+      } catch (error) {
+        audioEl.dispatchEvent(new Event('error', error));
+      }
+    };
+    startRecordingBtn.addEventListener('click', handleStartRecordingClick);
+
+    stopRecordingBtn.removeEventListener('click', handleStopRecordingClick);
+    hideBlock(stopRecordingBtn);
+    handleStopRecordingClick = async () => {
+      hideBlock(stopRecordingBtn);
+      showBlock(startRecordingBtn);
+      stopRecording();
+      stopRecording = NO_OP_CLEANUP;
+    };
+    stopRecordingBtn.addEventListener('click', handleStopRecordingClick);
+
+    const handleMicrophoneSelectorCleanup = () => {
+      handleStopRecordingClick();
+      microphonesSelectEl.removeEventListener('change', handleMicrophoneSelectorCleanup);
+    };
+    microphonesSelectEl.addEventListener('change', handleMicrophoneSelectorCleanup, { once: true });
+  };
+
+  microphonesSelectEl.addEventListener('change', handleMicrophoneSelectorChange);
+
   const errorEl = getOrDie('microphone-demo-error');
   const handleError = () => {
     errorEl.innerText = 'Unexpected error on audio feedback.';
     showBlock(errorEl);
+    hideBlock(audioEl);
   };
   audioEl.onerror = handleError;
+
   const handleOk = () => {
     errorEl.innerText = '';
     hideBlock(errorEl);
+    showBlock(audioEl);
   };
-  audioEl.onplay = handleOk;
+  audioEl.oncanplay = handleOk;
 }
 
 export function showAudioOutputsList(audioOutputs: MediaDeviceInfo[]): void {
@@ -164,33 +218,12 @@ async function activateSelectedCamera(): Promise<() => void> {
   }
 
   if (!isTurningOn) {
-    return () => {};
+    return NO_OP_CLEANUP;
   }
 
   return await startVideoMirror(
     camerasSelectEl.value,
     getOrDie('camera-demo-video') as HTMLVideoElement
-  );
-}
-
-async function activateSelectedMicrophone(): Promise<() => void> {
-  const microphonesSelectEl = getOrDie('microphones-select') as HTMLSelectElement;
-  const isTurningOn = !!microphonesSelectEl.value;
-
-  const microphoneDemoSectionEl = getOrDie('microphone-demo-section') as HTMLDivElement;
-  if (isTurningOn) {
-    showBlock(microphoneDemoSectionEl);
-  } else {
-    hideBlock(microphoneDemoSectionEl);
-  }
-
-  if (!isTurningOn) {
-    return () => {};
-  }
-
-  return await startAudioEcho(
-    microphonesSelectEl.value,
-    getOrDie('microphone-demo-audio') as HTMLAudioElement
   );
 }
 

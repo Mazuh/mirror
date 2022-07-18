@@ -24,10 +24,14 @@ select {
   width: 350px;
 }
 
-@media only screen and (max-width: 800px) {
-  select {
-    width: 100%;
-  }
+button {
+  background: #192a56;
+  color: #f5f6fa;
+  padding: 10px;
+}
+
+audio {
+  width: 600px;
 }
 
 .d-none {
@@ -44,6 +48,21 @@ select {
 
 .mirroed {
   transform: rotateY(180deg);
+}
+
+.outline-yellow {
+  outline: 1px solid #e1b12c;
+}
+
+.outline-green {
+  outline: 1px solid #44bd32;
+}
+
+@media only screen and (max-width: 800px) {
+  select,
+  audio {
+    width: 100%;
+  }
 }
 
 /* specific stuff */

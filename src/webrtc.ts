@@ -4,6 +4,10 @@ export interface FetchedMediaDevices {
   audioOutputs: MediaDeviceInfo[];
 }
 
+export type CleanupFn = () => Promise<unknown>;
+
+export const NO_OP_CLEANUP: CleanupFn = () => Promise.resolve();
+
 export async function fetchInputDevices(): Promise<FetchedMediaDevices> {
   try {
     if (!(await hasVideoPermissions())) {
@@ -69,93 +73,86 @@ export async function startVideoMirror(
   return stopVideoMirror;
 }
 
-export async function startAudioEcho(
+export async function startRecording(
   deviceId: string,
   audioEl: HTMLAudioElement
-): Promise<() => void> {
-  console.log('Initializing audio echo for device:', deviceId);
-
-  const recordingBufferRateMs = 1000;
-
-  let stopRecordingTimeout = 0;
-  let isRecording = false;
+): Promise<CleanupFn> {
+  console.log('Initializing audio input recorder for device:', deviceId);
 
   const audioStream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId } });
   const tracks = audioStream.getTracks();
   if (tracks.length !== 1) {
     console.error('Got invalid amount of audio tracks, cleaning them', tracks);
     tracks.forEach((t) => t.stop());
-    throw new Error('Failed to start echo recording.');
+    throw new Error('Failed to start recorder.');
   }
 
   const [track] = tracks;
   track.onended = () => {
-    console.log('Track ended, cleaning up echo resources.');
-    isRecording = false;
-    clearTimeout(stopRecordingTimeout);
-    clearInterval(checkRecordingInterval);
-    recorder?.stop();
+    if (recorder?.state === 'inactive') {
+      console.log('Track ended, recorder already inactive.');
+    } else {
+      console.log('Track ended, but recorder might still be active, so trying to stop it.');
+      recorder?.stop();
+    }
   };
 
   const killTrackAndTriggerEnding = () => {
-    console.log('Killing audio input track.');
+    console.log('Ending audio input track.');
     track.stop();
     track.dispatchEvent(new Event('ended'));
   };
-
-  const checkRecordingInterval = setInterval(() => {
-    console.log('Checking if recording is still active. Interval id:', checkRecordingInterval);
-    if (!isRecording) {
-      killTrackAndTriggerEnding();
-    }
-  }, 3000);
 
   const foundSupportedMediaType = findMediaTypeForRecordings();
   if (!foundSupportedMediaType) {
     throw new Error('Failed to find supported media type (i.e., no supported MIME found).');
   }
 
+  console.log('Recorder mime type:', foundSupportedMediaType);
   const blobType = foundSupportedMediaType;
   const recorderMimeType = foundSupportedMediaType;
-  console.log('Recorder mime type:', foundSupportedMediaType);
 
   const recorder = new MediaRecorder(audioStream, { mimeType: recorderMimeType });
   recorder.ondataavailable = async (event) => {
-    console.log('Handling chunk for device', deviceId, 'Timeout id:', stopRecordingTimeout);
-    clearTimeout(stopRecordingTimeout);
+    console.log('Handling recorded audio for device', deviceId);
 
-    if (!isRecording) {
-      return;
-    }
-
-    if (!event.data.size) {
-      stopRecordingTimeout = setTimeout(() => recorder.stop(), recordingBufferRateMs);
-      return;
-    }
-
-    const blob = new Blob([event.data], { type: blobType });
-    const url = URL.createObjectURL(blob);
-    audioEl.src = url;
-
-    console.log('Playing recorded chunk, then will continue to a next iteration.');
     try {
-      audioEl.muted = false;
-      await audioEl.play();
+      if (!event.data.size) {
+        console.log('No data found for the recorder, just ignoring.');
+        return;
+      }
+
+      const blob = new Blob([event.data], { type: blobType });
+      const url = URL.createObjectURL(blob);
+      audioEl.src = url;
     } catch (error) {
-      console.error('Detected exception on playing am audio chunk, ignoring.', error);
+      console.error('Failed to build blob and/or assign as audio source.', error);
+      audioEl.dispatchEvent(new Event('error', error));
+      return;
     }
 
-    recorder.start();
-    stopRecordingTimeout = setTimeout(() => recorder.stop(), recordingBufferRateMs);
+    try {
+      console.log('Trying to auto play recorded audio.');
+      audioEl.muted = false;
+      audioEl.load();
+      await audioEl.play();
+      console.log('Recorder audio successfully auto played.');
+    } catch (error) {
+      console.warn('Could not auto play recorded audio chunk, relying on manual mode.', error);
+    }
   };
 
-  console.log('Starting echo loop.');
+  console.log('Starting recorder.');
   recorder.start();
-  isRecording = true;
-  stopRecordingTimeout = setTimeout(() => recorder.stop(), recordingBufferRateMs);
 
-  const stopAudioEcho = killTrackAndTriggerEnding;
-  return stopAudioEcho;
+  const stopRecording = async () => {
+    try {
+      killTrackAndTriggerEnding();
+    } catch (error) {
+      console.error('Failed to kill audio input track and/or trigger its ending.');
+    }
+  };
+  return stopRecording;
 }
 
 function findMediaTypeForRecordings(): string | null {
