@@ -1,3 +1,4 @@
+import { startFaceDetection } from './advanced/face-detection.ts';
 import {
   CleanupFn,
   FetchedMediaDevices,
@@ -203,6 +204,33 @@ export function showAudioOutputsList(audioOutputs: MediaDeviceInfo[]): void {
     }
     listItemEl.title = audioOutput.deviceId;
     audioOutputsListEl.appendChild(listItemEl);
+  });
+}
+
+export async function setupFaceDetection() {
+  const startBtn = getOrDie('facedetection-start-btn') as HTMLButtonElement;
+  const stopBtn = getOrDie('facedetection-stop-btn') as HTMLButtonElement;
+
+  startBtn.addEventListener('click', async () => {
+    const videoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
+
+    const canvasEl = getOrDie('facedetection-canvas') as HTMLCanvasElement;
+    canvasEl.width = videoEl.clientWidth;
+    canvasEl.height = videoEl.clientHeight;
+
+    showBlock(canvasEl);
+    hideBlock(startBtn);
+    showBlock(stopBtn);
+
+    const stopFaceDetection = await startFaceDetection(videoEl, canvasEl);
+
+    const fullCleanup = () =>
+      stopFaceDetection().finally(() => {
+        hideBlock(canvasEl);
+        hideBlock(stopBtn);
+        showBlock(startBtn);
+      });
+    stopBtn.addEventListener('click', fullCleanup, { once: true });
   });
 }
 

@@ -32,6 +32,8 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
+    "@mediapipe/drawing_utils": "^0.3.1675466124",
+    "@mediapipe/face_detection": "^0.4.1646425229",
     "parcel-bundler": "^1.8.1",
     "webrtc-adapter": "^8.2.1"
   },
