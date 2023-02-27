@@ -1,3 +1,5 @@
+import adapter from 'webrtc-adapter';
+
 export interface FetchedMediaDevices {
   cameras: MediaDeviceInfo[];
   microphones: MediaDeviceInfo[];
@@ -170,3 +172,7 @@ function findMediaTypeForRecordings(): string | null {
     ].find((mime) => MediaRecorder.isTypeSupported(mime)) || null
   );
 }
+
+// adapter already made mutations globally, no need to use it directly,
+// but this might be useful for devs in the console
+(window as any).adapter = adapter;

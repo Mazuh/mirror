@@ -32,7 +32,8 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "parcel-bundler": "^1.12.5"
+    "parcel-bundler": "^1.12.5",
+    "webrtc-adapter": "^8.2.1"
   },
   "resolutions": {
     "@babel/preset-env": "7.13.8"
