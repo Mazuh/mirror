@@ -1,3 +1,4 @@
+import { startBackgrondBlur } from './advanced/background-blur.ts';
 import { startFaceDetection } from './advanced/face-detection.ts';
 import {
   CleanupFn,
@@ -223,6 +224,34 @@ export async function setupFaceDetection() {
     showBlock(stopBtn);
 
     const stopFaceDetection = await startFaceDetection(videoEl, canvasEl);
+
+    const fullCleanup = () =>
+      stopFaceDetection().finally(() => {
+        hideBlock(canvasEl);
+        hideBlock(stopBtn);
+        showBlock(startBtn);
+      });
+    stopBtn.addEventListener('click', fullCleanup, { once: true });
+  });
+}
+
+export async function setupBackgroundBlur() {
+  const startBtn = getOrDie('backgroundblur-start-btn') as HTMLButtonElement;
+  const stopBtn = getOrDie('backgroundblur-stop-btn') as HTMLButtonElement;
+
+  startBtn.addEventListener('click', async () => {
+    console.warn('click');
+    const videoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
+
+    const canvasEl = getOrDie('backgroundblur-canvas') as HTMLCanvasElement;
+    canvasEl.width = videoEl.clientWidth;
+    canvasEl.height = videoEl.clientHeight;
+
+    showBlock(canvasEl);
+    hideBlock(startBtn);
+    showBlock(stopBtn);
+
+    const stopFaceDetection = await startBackgrondBlur(videoEl, canvasEl);
 
     const fullCleanup = () =>
       stopFaceDetection().finally(() => {

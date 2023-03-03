@@ -4,6 +4,7 @@ import {
   setupCameraSelector,
   setupMicrophoneSelector,
   setupFaceDetection,
+  setupBackgroundBlur,
 } from './ui';
 import { fetchInputDevices } from './webrtc';
 
@@ -17,4 +18,5 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
   setupMicrophoneSelector(devices.microphones);
   showAudioOutputsList(devices.audioOutputs);
   setupFaceDetection();
+  setupBackgroundBlur();
 });

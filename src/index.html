@@ -78,15 +78,27 @@
 
       <section class="advanced-section">
         <h2>Advanced experiments</h2>
+        <p>
+          Most of them only work with desktop Chrome and you need to have previosly started your
+          video input above before hitting start buttons below.
+        </p>
 
-        <article class="facedetection">
+        <article>
           <h3>Face detection</h3>
-          <p>First start a video input above and only then press the start button below.</p>
           <button type="button" id="facedetection-start-btn" class="d-block">Start</button>
           <button type="button" id="facedetection-stop-btn" class="outline-yellow d-none">
             Stop
           </button>
           <canvas id="facedetection-canvas" class="d-none"></canvas>
+        </article>
+
+        <article>
+          <h3>Background blur</h3>
+          <button type="button" id="backgroundblur-start-btn" class="d-block">Start</button>
+          <button type="button" id="backgroundblur-stop-btn" class="outline-yellow d-none">
+            Stop
+          </button>
+          <canvas id="backgroundblur-canvas" class="d-none"></canvas>
         </article>
       </section>
     </main>
