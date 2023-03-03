@@ -34,7 +34,7 @@ export async function startBackgrondBlur(
 
     // draw blurred image behind existing content,
     // i.e., now selfie will remain but with the blurred image behind it.
-    canvasCtx.filter = 'blur(4px)';
+    canvasCtx.filter = 'blur(10px)';
     canvasCtx.globalCompositeOperation = 'destination-over';
     canvasCtx.drawImage(results.image, 0, 0, canvasEl.width, canvasEl.height);
 
