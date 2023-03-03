@@ -3,6 +3,7 @@ import { startFaceDetection } from './advanced/face-detection.ts';
 import {
   CleanupFn,
   FetchedMediaDevices,
+  getBrowserDetails,
   NO_OP_CLEANUP,
   startRecording,
   startVideoMirror,
@@ -206,6 +207,14 @@ export function showAudioOutputsList(audioOutputs: MediaDeviceInfo[]): void {
     listItemEl.title = audioOutput.deviceId;
     audioOutputsListEl.appendChild(listItemEl);
   });
+}
+
+export function showBrowserDetails(): void {
+  const browserNameEl = getOrDie('browsername');
+  const browserVersionEl = getOrDie('browserversion');
+  const { browser, version } = getBrowserDetails();
+  browserNameEl.textContent = browser;
+  browserVersionEl.textContent = version ? version.toString() : 'unknown';
 }
 
 export async function setupFaceDetection() {

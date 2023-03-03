@@ -43,6 +43,10 @@ export async function hasAudioPermissions(): Promise<boolean> {
     .some((d) => !!d.label);
 }
 
+export function getBrowserDetails() {
+  return adapter.browserDetails;
+}
+
 export async function askMediaPermission(constraints: MediaStreamConstraints): Promise<void> {
   try {
     const videoStream = await navigator.mediaDevices.getUserMedia(constraints);
