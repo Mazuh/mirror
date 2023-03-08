@@ -77,21 +77,30 @@
       <br />
 
       <section class="advanced-section">
-        <h2>Advanced experiments</h2>
-        <p>
-          Most of them only work with desktop Chrome and you need to have previously
-          <strong>started your video input above before</strong> hitting start buttons below.
-        </p>
+        <h2>WebRTC experiments</h2>
 
         <article>
           <h3>Browser data</h3>
+          <p>By WebRTCHacks Adapter.js inference.</p>
+          <p>
+            For some mobile devices, your <strong>real</strong> browser engine will be revealed
+            below, despite of its user-friendly presentation name.
+          </p>
           <p>Name: <code id="browsername">unknown</code></p>
           <p>Version: <code id="browserversion">unknown</code></p>
         </article>
 
         <article>
           <h3>Face detection</h3>
-          <button type="button" id="facedetection-start-btn" class="d-block">Start</button>
+          <p>Using MediaPipe with native Canvas.</p>
+          <p>
+            You need to have
+            <strong>successfully started</strong> your video input above
+            <strong>before</strong> hitting the start button below.
+          </p>
+          <button type="button" id="facedetection-start-btn" class="d-block">
+            Start face detection
+          </button>
           <button type="button" id="facedetection-stop-btn" class="outline-yellow d-none">
             Stop
           </button>
@@ -100,11 +109,22 @@
 
         <article>
           <h3>Background blur</h3>
-          <button type="button" id="backgroundblur-start-btn" class="d-block">Start</button>
+          <p>
+            Using MediaPipe with native (and very new) Insertable Streams. It only works for
+            <strong>desktop Chrome</strong>.
+          </p>
+          <p>
+            You need to have
+            <strong>successfully started</strong> your video input above
+            <strong>before</strong> hitting the start button below.
+          </p>
+          <button type="button" id="backgroundblur-start-btn" class="d-block">
+            Start background blur
+          </button>
           <button type="button" id="backgroundblur-stop-btn" class="outline-yellow d-none">
             Stop
           </button>
-          <canvas id="backgroundblur-canvas" class="d-none"></canvas>
+          <video id="backgroundblur-video" class="d-none w-100" loop muted playsinline></video>
         </article>
       </section>
     </main>

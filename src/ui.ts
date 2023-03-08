@@ -249,22 +249,21 @@ export async function setupBackgroundBlur() {
   const stopBtn = getOrDie('backgroundblur-stop-btn') as HTMLButtonElement;
 
   startBtn.addEventListener('click', async () => {
-    console.warn('click');
-    const videoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
+    const sourceVideoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
 
-    const canvasEl = getOrDie('backgroundblur-canvas') as HTMLCanvasElement;
-    canvasEl.width = videoEl.clientWidth;
-    canvasEl.height = videoEl.clientHeight;
+    const targetVideoEl = getOrDie('backgroundblur-video') as HTMLCanvasElement;
+    targetVideoEl.width = sourceVideoEl.clientWidth;
+    targetVideoEl.height = sourceVideoEl.clientHeight;
 
-    showBlock(canvasEl);
+    showBlock(targetVideoEl);
     hideBlock(startBtn);
     showBlock(stopBtn);
 
-    const stopFaceDetection = await startBackgrondBlur(videoEl, canvasEl);
+    const stopFaceDetection = await startBackgrondBlur(sourceVideoEl, targetVideoEl);
 
     const fullCleanup = () =>
       stopFaceDetection().finally(() => {
-        hideBlock(canvasEl);
+        hideBlock(targetVideoEl);
         hideBlock(stopBtn);
         showBlock(startBtn);
       });
