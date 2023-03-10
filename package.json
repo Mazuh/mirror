@@ -35,6 +35,7 @@
     "@mediapipe/drawing_utils": "^0.3.1675466124",
     "@mediapipe/face_detection": "^0.4.1646425229",
     "@mediapipe/selfie_segmentation": "^0.1.1675465747",
+    "@vonage/media-processor": "^2.0.2",
     "parcel-bundler": "^1.8.1",
     "webrtc-adapter": "^8.2.1"
   },

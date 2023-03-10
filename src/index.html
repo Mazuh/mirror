@@ -8,6 +8,7 @@
       name="description"
       content="Simple test for your camera and microphone devices, just like a mirror."
     />
+    <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
   </head>
   <body>
     <header class="page-header">
@@ -125,6 +126,14 @@
             Stop
           </button>
           <video id="backgroundblur-video" class="d-none w-100" loop muted playsinline></video>
+        </article>
+
+        <article>
+          <h3>Vonage</h3>
+          <div id="videos">
+            <div id="subscriber" style="height: 640px"></div>
+            <div id="publisher" style="height: 640px"></div>
+          </div>
         </article>
       </section>
     </main>

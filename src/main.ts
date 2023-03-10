@@ -8,6 +8,7 @@ import {
   showBrowserDetails,
 } from './ui';
 import { fetchInputDevices } from './webrtc';
+import './advanced/vonage';
 
 document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
   const devices = await fetchInputDevices();
