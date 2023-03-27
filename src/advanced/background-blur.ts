@@ -7,10 +7,10 @@ export async function startBackgrondBlur(
   sourceVideoEl: HTMLVideoElement,
   targetVideoEl: HTMLVideoElement
 ): Promise<CleanupFn> {
-  // some dom-based stuff
+  // some last dom-based stuff
   const [sourceVideoTrack] = (sourceVideoEl.srcObject as MediaStream).getVideoTracks();
-  const width = sourceVideoEl.clientWidth;
-  const height = sourceVideoEl.clientHeight;
+  const width = sourceVideoEl.clientWidth || 640;
+  const height = sourceVideoEl.clientHeight || 480;
 
   // setup semantic segmentation, downloading its models and other metadata
   const selfieSegmentation = new SelfieSegmentation({
