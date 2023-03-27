@@ -126,6 +126,32 @@
           </button>
           <video id="backgroundblur-video" class="d-none w-100" loop muted playsinline></video>
         </article>
+
+        <article>
+          <h3>Background replacement</h3>
+          <p>
+            Using MediaPipe with native (and the very new) Insertable Streams. It only works for
+            <strong>desktop Chrome</strong>.
+          </p>
+          <p>
+            You need to have
+            <strong>started your video input</strong> at the beginning of the page,
+            <strong>wait for it to be fully loaded</strong> and only then hit "start" button below.
+          </p>
+          <button type="button" id="backgroundreplacement-start-btn" class="d-block">
+            Start background replacement
+          </button>
+          <button type="button" id="backgroundreplacement-stop-btn" class="outline-yellow d-none">
+            Stop
+          </button>
+          <video
+            id="backgroundreplacement-video"
+            class="d-none w-100"
+            loop
+            muted
+            playsinline
+          ></video>
+        </article>
       </section>
     </main>
 

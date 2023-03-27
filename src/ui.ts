@@ -1,4 +1,5 @@
 import { startBackgrondBlur } from './advanced/background-blur.ts';
+import { startBackgrondReplacement } from './advanced/background-replacement';
 import { startFaceDetection } from './advanced/face-detection.ts';
 import {
   CleanupFn,
@@ -260,6 +261,33 @@ export async function setupBackgroundBlur() {
     showBlock(stopBtn);
 
     const stopFaceDetection = await startBackgrondBlur(sourceVideoEl, targetVideoEl);
+
+    const fullCleanup = () =>
+      stopFaceDetection().finally(() => {
+        hideBlock(targetVideoEl);
+        hideBlock(stopBtn);
+        showBlock(startBtn);
+      });
+    stopBtn.addEventListener('click', fullCleanup, { once: true });
+  });
+}
+
+export async function setupBackgroundReplacement() {
+  const startBtn = getOrDie('backgroundreplacement-start-btn') as HTMLButtonElement;
+  const stopBtn = getOrDie('backgroundreplacement-stop-btn') as HTMLButtonElement;
+
+  startBtn.addEventListener('click', async () => {
+    const sourceVideoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
+
+    const targetVideoEl = getOrDie('backgroundreplacement-video') as HTMLVideoElement;
+    targetVideoEl.width = sourceVideoEl.clientWidth;
+    targetVideoEl.height = sourceVideoEl.clientHeight;
+
+    showBlock(targetVideoEl);
+    hideBlock(startBtn);
+    showBlock(stopBtn);
+
+    const stopFaceDetection = await startBackgrondReplacement(sourceVideoEl, targetVideoEl);
 
     const fullCleanup = () =>
       stopFaceDetection().finally(() => {
