@@ -1,4 +1,3 @@
-import './rvfc-polyfill';
 import { FaceDetection } from '@mediapipe/face_detection';
 import * as drawingUtils from '@mediapipe/drawing_utils';
 import pkg from '../../package.json';

@@ -251,7 +251,7 @@ export async function setupBackgroundBlur() {
   startBtn.addEventListener('click', async () => {
     const sourceVideoEl = getOrDie('camera-demo-video') as HTMLVideoElement;
 
-    const targetVideoEl = getOrDie('backgroundblur-video') as HTMLCanvasElement;
+    const targetVideoEl = getOrDie('backgroundblur-video') as HTMLVideoElement;
     targetVideoEl.width = sourceVideoEl.clientWidth;
     targetVideoEl.height = sourceVideoEl.clientHeight;
 

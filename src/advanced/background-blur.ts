@@ -1,4 +1,3 @@
-import './rvfc-polyfill';
 import pkg from '../../package.json';
 import { CleanupFn } from '../webrtc';
 import { Results, SelfieSegmentation } from '@mediapipe/selfie_segmentation';
